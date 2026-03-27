@@ -1,0 +1,557 @@
+//user.Migration
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('users', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->string('email')->unique();
+            $table->timestamp('email_verified_at')->nullable();
+            $table->string('password');
+            $table->rememberToken();
+            $table->timestamps();
+        });
+
+        Schema::create('password_reset_tokens', function (Blueprint $table) {
+            $table->string('email')->primary();
+            $table->string('token');
+            $table->timestamp('created_at')->nullable();
+        });
+
+        Schema::create('sessions', function (Blueprint $table) {
+            $table->string('id')->primary();
+            $table->foreignId('user_id')->nullable()->index();
+            $table->string('ip_address', 45)->nullable();
+            $table->text('user_agent')->nullable();
+            $table->longText('payload');
+            $table->integer('last_activity')->index();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('users');
+        Schema::dropIfExists('password_reset_tokens');
+        Schema::dropIfExists('sessions');
+    }
+};
+
+//Middleware
+<?php
+
+namespace App\Http\Middleware;
+
+use Closure;
+use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Response;
+
+class RoleMiddleware
+{
+    /**
+     * Handle an incoming request.
+     *
+     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
+     */
+    public function handle(Request $request, Closure $next): Response
+    {
+        return $next($request);
+    }
+}
+
+//sessions
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('sessions', function (Blueprint $table) {
+            $table->id();
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('sessions');
+    }
+};
+
+// index.buku
+<div class="container">
+    <h1>Daftar Buku</h1>
+
+    <!-- @if (auth()->user()->role === 'admin')
+    <a href="{{ route('buku.create') }}" class="btn btn-primary mb-3">
+        + Tambah Buku
+    </a>
+    @endif -->
+
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Judul</th>
+                <th>Penulis</th>
+                <th>Penerbit</th>
+                <th>Tahun</th>
+                <th>Stok</th>
+                <!-- @if (auth()->user()->role === 'admin')
+                <th>Aksi</th>
+                @endif -->
+            </tr>
+        </thead>
+        <tbody>
+            @foreach ($buku as $item)
+            <tr>
+                <td>{{ $item->judul }}</td>
+                <td>{{ $item->penulis }}</td>
+                <td>{{ $item->penerbit }}</td>
+                <td>{{ $item->tahun }}</td>
+                <td>{{ $item->stok }}</td>
+
+                <!-- @if (auth()->user()->role === 'admin')
+                <td>
+                    <a href="{{ route('buku.edit', $item->id) }}" class="btn btn-warning btn-sm">Edit</a>
+
+                    <form action="{{ route('buku.destroy', $item->id) }}" method="POST" style="display:inline">
+                        @csrf
+                        @method('DELETE')
+                        <button class="btn btn-danger btn-sm"
+                            onclick="return confirm('Yakin hapus buku?')">
+                            Hapus
+                        </button>
+                    </form>
+                </td>
+                @endif -->
+            </tr>
+            @endforeach
+        </tbody>
+    </table>
+</div>
+
+//auth.controller
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use App\Models\User;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+
+class AuthController extends Controller
+{
+    public function showLogin()
+    {
+        return view('auth.login');
+    }
+
+    public function showRegister()
+    {
+        return view('auth.register');
+    }
+
+    public function register(Request $request)
+    {
+        $request->validate([
+            'name' => 'required',
+            'email' => 'required|email|unique:users',
+            'password' => 'required|min:6'
+        ]);
+
+        User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+            'role' => 'user'
+        ]);
+
+        return redirect('/login');
+    }
+
+    public function login(Request $request)
+    {
+        $credentials = $request->only('email', 'password');
+
+        if (Auth::attempt($credentials)) {
+            return redirect('/dashboard');
+        }
+
+        return back()->withErrors(['login' => 'Email atau password salah']);
+    }
+
+    public function logout()
+    {
+        Auth::logout();
+        return redirect('/login');
+    }
+}
+
+//login.blade.php
+<body class="bg-gradient-primary">
+
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-xl-10 col-lg-12 col-md-9">
+                <div class="card o-hidden border-0 shadow-lg my-5">
+                    <div class="card-body p-0">
+                        <div class="row">
+                            <div class="col-lg-6 d-none d-lg-block bg-login-image"></div>
+                            <div class="col-lg-6">
+                                <div class="p-5">
+                                    <div class="text-center">
+                                        <h1 class="h4 text-gray-900 mb-4">Welcome Back!</h1>
+                                    </div>
+
+                                    <form class="user" method="POST" action="{{ route('login') }}">
+                                        @csrf
+
+                                        <div class="form-group">
+                                            <input type="email" name="email"
+                                                class="form-control form-control-user"
+                                                placeholder="Enter Email Address..."
+                                                required>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <input type="password" name="password"
+                                                class="form-control form-control-user"
+                                                placeholder="Password"
+                                                required>
+                                        </div>
+
+                                        <button type="submit"
+                                            class="btn btn-primary btn-user btn-block">
+                                            Login
+                                        </button>
+                                    </form>
+
+                                    <hr>
+
+                                    <div class="text-center">
+                                        <a class="small" href="{{ route('register') }}">
+                                            Create an Account!
+                                        </a>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+//register.blade.php
+<body class="bg-gradient-primary">
+
+    <div class="container">
+        <div class="card o-hidden border-0 shadow-lg my-5">
+            <div class="card-body p-0">
+                <div class="row">
+                    <div class="col-lg-5 d-none d-lg-block bg-register-image"></div>
+                    <div class="col-lg-7">
+                        <div class="p-5">
+                            <div class="text-center">
+                                <h1 class="h4 text-gray-900 mb-4">Create an Account!</h1>
+                            </div>
+
+                            <form class="user" method="POST" action="{{ route('register') }}">
+                                @csrf
+
+                                <div class="form-group">
+                                    <input type="text" name="name"
+                                        class="form-control form-control-user"
+                                        placeholder="Full Name"
+                                        required>
+                                </div>
+
+                                <div class="form-group">
+                                    <input type="email" name="email"
+                                        class="form-control form-control-user"
+                                        placeholder="Email Address"
+                                        required>
+                                </div>
+
+                                <div class="form-group row">
+                                    <div class="col-sm-6 mb-3 mb-sm-0">
+                                        <input type="password" name="password"
+                                            class="form-control form-control-user"
+                                            placeholder="Password"
+                                            required>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <input type="password" name="password_confirmation"
+                                            class="form-control form-control-user"
+                                            placeholder="Repeat Password"
+                                            required>
+                                    </div>
+                                </div>
+
+                                <button type="submit"
+                                    class="btn btn-primary btn-user btn-block">
+                                    Register Account
+                                </button>
+                            </form>
+
+                            <hr>
+
+                            <div class="text-center">
+                                <a class="small" href="{{ route('login') }}">
+                                    Already have an account? Login!
+                                </a>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+//web.php
+Route::get('/login', [AuthController::class, 'showLogin']);
+Route::post('/login', [AuthController::class, 'login']);
+
+Route::get('/register', [AuthController::class, 'showRegister']);
+Route::post('/register', [AuthController::class, 'register']);
+
+<?php
+
+use App\Http\Controllers\User\BukuController as UserBukuController;
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\BukuController;
+use App\Http\Controllers\MemberController;
+use App\Http\Controllers\TransaksiController;
+use App\Http\Controllers\DashboardController;
+
+Route::get('/', function () {
+    return view('index');
+})->middleware('auth');
+
+
+// dashboard admin
+Route::get('/admin', [DashboardController::class, 'index'])
+    ->name('admin.dashboard');
+
+// dashboard user
+Route::get('/user', function () {
+    return view('user.dashboard');
+});
+
+//login
+Route::get('/login', [AuthController::class, 'login'])->name('login');
+Route::post('/login', [AuthController::class, 'authenticate']);
+
+Route::get('/register', [AuthController::class, 'register'])->name('register');
+Route::post('/register', [AuthController::class, 'store'])->name('register.store');
+
+
+Route::post('/logout', [AuthController::class, 'logout']);
+
+//Admin Only
+Route::resource('buku', BukuController::class);
+// Route::middleware(['auth', 'role:admin'])->group(function () {
+//     Route::resource('buku', BukuController::class);
+//     // Route::resource('members', MemberController::class);
+// });
+
+//User Only
+// Route::middleware(['auth', 'role:user'])->group(function () {
+Route::resource('transaksi', TransaksiController::class)
+    ->only(['index', 'create', 'store', 'update']);
+// });
+
+Route::get('/buku', [UserBukuController::class, 'index'])
+    ->name('user.buku');
+
+<--^^^web.php^^^--!>
+
+<---|||DashboardController|||---!> <- admin coy
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use App\Models\Transaksi;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
+
+class DashboardController extends Controller
+{
+    public function index()
+    {
+        $data = Transaksi::selectRaw('
+        DATE(tanggal_pinjam) as tanggal,
+        SUM(jumlah) as total,
+        status
+    ')
+            ->whereBetween('tanggal_pinjam', [
+                now()->subDays(6),
+                now()
+            ])
+            ->groupBy('tanggal', 'status')
+            ->get();
+
+        $labels = $data->pluck('tanggal')->unique()->values();
+        $labels = $labels->map(function ($tgl) {
+            return Carbon::parse($tgl)->format('d M');
+        });
+
+        $dipinjam = [];
+        $dikembalikan = [];
+
+        foreach ($labels as $tgl) {
+            $dipinjam[] = $data->where('tanggal', $tgl)
+                ->where('status', 'dipinjam')
+                ->sum('total');
+
+            $dikembalikan[] = $data->where('tanggal', $tgl)
+                ->where('status', 'dikembalikan')
+                ->sum('total');
+        }
+
+        return view('admin.dashboard', compact(
+            'labels',
+            'dipinjam',
+            'dikembalikan'
+        ));
+    }
+}
+
+public function index()
+    {
+        // Ambil 7 hari terakhir (format DATE asli)
+        $dates = collect();
+        for ($i = 6; $i >= 0; $i--) {
+            $dates->push(now()->subDays($i)->toDateString());
+        }
+
+        // Ambil data transaksi
+        $data = Transaksi::selectRaw('
+                DATE(tanggal_pinjam) as tanggal,
+                status,
+                SUM(jumlah) as total
+            ')
+            ->whereBetween('tanggal_pinjam', [
+                now()->subDays(6)->startOfDay(),
+                now()->endOfDay()
+            ])
+            ->groupBy('tanggal', 'status')
+            ->get();
+
+        // Labels buat chart (format manusia)
+        $labels = $dates->map(fn ($tgl) =>
+            Carbon::parse($tgl)->format('d M')
+        );
+
+        $dipinjam = [];
+        $dikembalikan = [];
+
+        foreach ($dates as $tgl) {
+            $dipinjam[] = $data
+                ->where('tanggal', $tgl)
+                ->where('status', 'dipinjam')
+                ->sum('total');
+
+            $dikembalikan[] = $data
+                ->where('tanggal', $tgl)
+                ->where('status', 'dikembalikan')
+                ->sum('total');
+        }
+
+        return view('admin.dashboard', compact(
+            'labels',
+            'dipinjam',
+            'dikembalikan'
+        ));
+
+<--- layout.admin ---!>
+    <!-- Chart.js -->
+    <script src="{{ asset('vendor/chart.js/Chart.min.js') }}"></script>
+
+    <a class="collapse-item" href="{{ route('admin.laporan') }}">Laporan</a>
+
+
+<!--- profilcontroller --->
+    public function updateTheme(Request $request)
+    {
+        $request->validate([
+            'theme' => 'required|in:light,dark'
+        ]);
+
+        auth()->user()->update([
+            'theme' => $request->theme
+        ]);
+
+        return response()->json(['success' => true]);
+    }
+
+<!--- layout.user --->
+    <style>
+        /* DARK MODE */
+        .dark-mode {
+            background-color: #121212 !important;
+            color: #e4e6eb !important;
+        }
+
+        .dark-mode .card {
+            background-color: #1e1e2f !important;
+            color: #fff !important;
+        }
+
+        .dark-mode .navbar {
+            background-color: #1a1a2e !important;
+        }
+
+        .dark-mode .topbar {
+            background-color: #1a1a2e !important;
+        }
+
+        .dark-mode .sidebar {
+            background: linear-gradient(180deg, #111827 10%, #0f172a 100%) !important;
+        }
+
+        .dark-mode .footer,
+        .dark-mode .sticky-footer {
+            background-color: #1a1a2e !important;
+            color: #fff !important;
+        }
+
+        .dark-mode input,
+        .dark-mode select,
+        .dark-mode textarea {
+            background-color: #2a2a3d !important;
+            color: #fff !important;
+            border-color: #444 !important;
+        }
+    </style>

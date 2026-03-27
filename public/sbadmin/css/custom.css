@@ -1,0 +1,27 @@
+.dark-mode {
+    background-color: #121212;
+    color: white;
+}
+
+.dark-mode .card {
+    background-color: #1e1e1e;
+    color: white;
+}
+
+.dark-mode .navbar {
+    background-color: #1a1a1a !important;
+}
+
+.dark-mode #content-wrapper {
+    background-color: #121212 !important;
+}
+
+.dark-mode .container-fluid {
+    background-color: #121212 !important;
+}
+
+.dark-mode .footer,
+.dark-mode .sticky-footer {
+    background-color: #1a1a1a !important;
+    color: white !important;
+}
