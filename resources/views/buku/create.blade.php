@@ -1,11 +1,11 @@
-@extends('layout.template')
+@extends('layout.admin')
 
 @section('content')
-<a href="{{ route('buku.index') }}" class="btn btn-secondary mb-3">Batal</a>
+<a href="{{ route('admin.buku.index') }}" class="btn btn-secondary mb-3">Batal</a>
 
 <div class="card">
     <div class="card-body">
-        <form action="{{ route('buku.store') }}" method="POST" enctype="multipart/form-data">
+        <form action="{{ route('admin.buku.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
 
             <div class="mb-3">
