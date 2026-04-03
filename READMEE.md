@@ -12,7 +12,7 @@ melakukan pengembalian dan peminjaman buku sekaligus sistem denda bagi user jika
 * Upload Gambar Buku
 * Sistem Peminjaman Buku
 * Sistem Pengembalian Buku
-* Sistem Denda jika user telat melakukan pengembalian buku
+* Sistem Denda jika user telat melakukan pengembalian buku (experimental)
 * Manajemen user (Admin & User)
 
 ## Teknologi yang Digunakan
