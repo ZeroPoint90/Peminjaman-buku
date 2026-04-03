@@ -29,18 +29,24 @@
 
             <td>
                 <span class="badge bg-{{ $item->status == 'dipinjam' ? 'warning' : 'success' }}">
-                    {{ $item->status }}
+                    @if($item->status_label == 'Terlambat')
+                    <span class="badge bg-danger">Terlambat</span>
+                    @elseif($item->status_label == 'Dikembalikan')
+                    <span class="badge bg-success">Dikembalikan</span>
+                    @else
+                    <span class="badge bg-warning">Dipinjam</span>
+                    @endif
                 </span>
             </td>
 
             <!-- Denda -->
             <td>
-                Rp {{ number_format($item->denda ?? 0, 0, ',', '.') }}
+                Rp {{ number_format($item->denda_realtime, 0, ',', '.') }}
                 <br>
                 @if(($item->denda ?? 0) > 0)
-                    <span class="text-danger">Telat</span>
+                <span class="text-danger">Telat</span>
                 @else
-                    <span class="text-success">Aman</span>
+                <span class="text-success">Aman</span>
                 @endif
             </td>
 
@@ -55,7 +61,7 @@
                     </button>
                 </form>
                 @else
-                    <span class="text-muted">-</span>
+                <span class="text-muted">-</span>
                 @endif
             </td>
         </tr>

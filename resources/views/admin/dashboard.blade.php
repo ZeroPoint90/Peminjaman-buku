@@ -27,6 +27,7 @@
                     <th>Judul Buku</th>
                     <th>Jumlah</th>
                     <th>Status</th>
+                    <th>Aksi</th>
                 </tr>
             </thead>
             <tbody>
@@ -46,6 +47,19 @@
                     <td colspan="4" class="text-center">Belum ada data</td>
                 </tr>
                 @endforelse
+                 <td>
+                @if($item->status == 'dipinjam')
+                <form action="{{ route('admin.force.kembali', $item->id) }}" method="POST">
+                    @csrf
+                    @method('PATCH')
+                    <button class="btn btn-danger btn-sm">
+                        Paksa Kembalikan
+                    </button>
+                </form>
+                @else
+                    <span class="text-muted">-</span>
+                @endif
+            </td>
             </tbody>
         </table>
     </div>

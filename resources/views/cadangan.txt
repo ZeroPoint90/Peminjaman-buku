@@ -555,3 +555,8 @@ public function index()
             border-color: #444 !important;
         }
     </style>
+
+<---migrations transaksi!--->
+$table->date('tanggal_pinjam');
+            $table->date('tanggal_kembali_rencana')->nullable();
+            $table->date('tanggal_kembali')->nullable();
