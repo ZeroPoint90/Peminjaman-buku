@@ -87,7 +87,7 @@ class TransaksiController extends Controller
     // PAKSA PENGEMBALIAN
     public function forceKembalikan($id)
     {
-        $transaksi = \App\Models\Transaksi::findOrFail($id);
+        $transaksi = Transaksi::findOrFail($id);
 
         // Kalau sudah dikembalikan
         if ($transaksi->tanggal_kembali) {
@@ -106,9 +106,11 @@ class TransaksiController extends Controller
 
         $transaksi->update([
             'tanggal_kembali' => $today,
-            'status' => 'kembali',
+            'status' => 'dikembalikan',
             'denda' => $denda
         ]);
+
+        $transaksi->buku->increment('stok', $transaksi->jumlah);
 
         return back()->with('success', 'Buku berhasil dikembalikan paksa');
     }

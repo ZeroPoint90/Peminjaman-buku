@@ -2,7 +2,7 @@
 
 @section('content')
 <h1>Daftar Buku</h1>
-<a href="{{ route('buku.create') }}" class="btn btn-primary mb-3">Tambah Buku</a>
+<a href="{{ route('admin.buku.create') }}" class="btn btn-primary mb-3">Tambah Buku</a>
 <table id="bukuTable" class="table table-bordered">
     <thead>
         <tr>
@@ -39,8 +39,8 @@
             <td>{{ $item->tahun }}</td>
             <td>{{ $item->stok }}</td>
             <td>
-                <a href="{{ route('buku.edit', $item->id) }}" class="btn btn-sm btn-primary">Edit</a>
-                <form action="{{ route('buku.destroy', $item->id) }}" method="POST" style="display:inline;">
+                <a href="{{ route('admin.buku.edit', $item->id) }}" class="btn btn-sm btn-primary">Edit</a>
+                <form action="{{ route('admin.buku.destroy', $item->id) }}" method="POST" style="display:inline;">
                     @csrf
                     @method('DELETE')
                     <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Apakah Anda yakin ingin menghapus buku ini?')">Hapus</button>

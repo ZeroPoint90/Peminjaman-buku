@@ -45,7 +45,7 @@ class BukuController extends Controller
 
         Buku::create($data);
 
-        return redirect()->route('buku.index')
+        return redirect()->route('admin.buku.index')
             ->with('success', 'Buku berhasil ditambahkan');
     }
 
@@ -57,12 +57,12 @@ class BukuController extends Controller
     public function update(Request $request, Buku $buku)
     {
         $buku->update($request->all());
-        return redirect()->route('buku.index');
+        return redirect()->route('admin.buku.index');
     }
 
     public function destroy(Buku $buku)
     {
         $buku->delete();
-        return redirect()->route('buku.index');
+        return redirect()->route('admin.buku.index');
     }
 }

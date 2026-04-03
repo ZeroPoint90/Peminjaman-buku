@@ -10,6 +10,7 @@
             <th>Judul Buku</th>
             <th>Jumlah</th>
             <th>Status</th>
+            <th>Denda</th>
             <th>Aksi</th>
         </tr>
     </thead>
@@ -19,7 +20,10 @@
         <tr>
             <td>{{ $item->buku->judul }}</td>
             <td>{{ $item->jumlah }}</td>
-            <td>{{ $item->status }}</td>
+            <td>{{ $item->status_label }}</td>
+            <td>
+                Rp {{ number_format($item->denda_realtime, 0, ',', '.') }}
+            </td>
             <td>
                 @if($item->status == 'dipinjam')
                 <form action="{{ route('user.transaksi.kembalikan', $item->id) }}"

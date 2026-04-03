@@ -144,7 +144,7 @@
                                     <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
                                     Profile
                                 </a> -->
-                                <a class="dropdown-item" href="{{ route('settings') }}">
+                                <a class="dropdown-item" href="{{ route('user.settings') }}">
                                     <i class="fas fa-cogs fa-sm fa-fw mr-2 text-gray-400"></i>
                                     Settings
                                 </a>
@@ -247,7 +247,7 @@
                     // Ubah tampilan
                     document.body.classList.toggle("dark-mode", theme === "dark");
 
-                    fetch("{{ route('update.theme') }}", {
+                    fetch("{{ route('user.update.theme') }}", {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json",
