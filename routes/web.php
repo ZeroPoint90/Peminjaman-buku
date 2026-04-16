@@ -12,20 +12,6 @@ use App\Http\Controllers\Admin\TransaksiController as AdminTransaksiController;
 use App\Http\Controllers\Admin\MemberController;
 use App\Http\Controllers\DashboardController;
 
-// Route::get('/', function () {
-//     return view('index');
-// })->middleware('auth');
-
-//settings
-// Route::middleware(['auth'])->group(function () {
-//     Route::get('/settings', [ProfilController::class, 'settings'])->name('settings');
-//     Route::post('/update-theme', [ProfilController::class, 'updateTheme'])->name('update.theme');
-// });
-
-// dashboard admin
-// Route::get('/admin', [DashboardController::class, 'index'])
-//     ->name('admin.dashboard');
-
 //login
 Route::get('/login', [AuthController::class, 'login'])->name('login');
 Route::post('/login', [AuthController::class, 'authenticate']);
