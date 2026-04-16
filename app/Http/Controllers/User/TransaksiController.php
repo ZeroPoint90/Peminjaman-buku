@@ -44,17 +44,13 @@ public function store(Request $request)
 
     $request->validate([
         'buku_id' => 'required|exists:buku,id',
-        'tanggal_kembali_rencana' => [
-            'required',
-            'date',
-            'after:today',
-            'before_or_equal:' . $maxTanggal->format('Y-m-d'),
-        ],
+        'tanggal_kembali_rencana' => 'required|in:2,4,7',
         'jumlah'  => 'required|integer|min:1|max:2',
     ]);
 
     $buku = Buku::findOrFail($request->buku_id);
     $tanggalPinjam = Carbon::now();
+    $tanggalKembali = Carbon::now()->addDays($request->tanggal_kembali_rencana);
 
     if ($buku->stok < $request->jumlah) {
         return back()->with('error', 'Stok tidak cukup');
@@ -65,7 +61,7 @@ public function store(Request $request)
         'buku_id' => $request->buku_id,
         'jumlah'  => $request->jumlah,
         'tanggal_pinjam' => $tanggalPinjam,
-        'tanggal_kembali_rencana' => $request->tanggal_kembali_rencana,
+        'tanggal_kembali_rencana' => $tanggalKembali,
         'status' => 'dipinjam'
     ]);
 
