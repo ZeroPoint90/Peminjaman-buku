@@ -18,7 +18,16 @@
                 min="1"
                 max="2"
                 value="1"
-                class="form-control mb-2">
+                class="form-control mb-1"
+                {{ $book->stok == 0 ? 'disabled' : '' }}>
+
+            <label>Tanggal Kembali</label>
+            <select name="tanggal_kembali_rencana" class="form-control mb-2">
+                <option value="">-- Pilih --</option>
+                <option value="2">2 Hari</option>
+                <option value="4">4 Hari</option>
+                <option value="7">7 Hari</option>
+            </select>
 
             <button type="submit"
                 class="btn btn-primary w-100"
@@ -27,7 +36,7 @@
             </button>
         </form>
 
-        <div class="col-md-3 mb-4">
+        <div class="col-md-4 mb-4">
             <div class="card shadow-sm h-100">
                 <img
                     src="{{ asset('gambar/' . $book->gambar) }}"
