@@ -49,15 +49,29 @@ class BukuController extends Controller
             ->with('success', 'Buku berhasil ditambahkan');
     }
 
-    // public function edit(Buku $book)
-    // {
-    //     return view('books.edit', compact('book'));
-    // }
+    public function edit(Request $request, $id)
+    {
+        $buku = Buku::findOrFail($id);
+        return view('buku.edit', compact('buku'));
+    }
 
     public function update(Request $request, Buku $buku)
     {
+        $request->validate([
+            'judul' => 'required',
+            'penulis' => 'required',
+            'tahun' => 'required|numeric'
+        ]);
+
+        $buku->update([
+            'judul' => $request->judul,
+            'penulis' => $request->penulis,
+            'tahun' => $request->tahun
+        ]);
+
         $buku->update($request->all());
-        return redirect()->route('admin.buku.index');
+        return redirect()->route('admin.buku.index')
+        ->with('success', 'Buku berhasil diperbarui');
     }
 
     public function destroy(Buku $buku)

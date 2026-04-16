@@ -1,7 +1,7 @@
 @extends('layout.admin')
 
 @section('content')
-<a href="{{ route('admin.buku.index') }}" class="btn btn-secondary mb-3">Batal</a>
+<a href="{{ route('admin.buku.index') }}" class="btn btn-primary mb-3">Batal</a>
 
 <div class="card">
     <div class="card-body">
